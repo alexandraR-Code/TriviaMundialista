@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
   construirPartidos();
   inicializarEventos();
   poblarSelectoresAdmin();
-  restaurarEstado();
+  // Siempre inicia en pantalla de registro — el usuario puede ver sus pronósticos
+  // ingresando su correo con el link "¿Ya te registraste?"
 });
 
 // ── PERSISTENCIA LOCAL (localStorage) ────────────────────────
@@ -52,24 +53,6 @@ function guardarEstadoLocal() {
       yaEnvio: estado.yaEnvio
     }));
   } catch (e) { /* almacenamiento no disponible */ }
-}
-
-function restaurarEstado() {
-  try {
-    var raw = localStorage.getItem(LS_KEY);
-    if (!raw) return;
-    var datos = JSON.parse(raw);
-    if (datos && datos.participante) {
-      estado.participante = datos.participante;
-      estado.yaEnvio = !!datos.yaEnvio;
-      document.getElementById('chipNombre').textContent = datos.participante.nombre.split(' ')[0];
-      if (estado.yaEnvio) {
-        irAPantalla('pantallaConfirmacion');
-      } else {
-        irAPantalla('pantallaPronosticos');
-      }
-    }
-  } catch (e) { /* datos corruptos o no disponibles */ }
 }
 
 
@@ -94,20 +77,6 @@ function construirPartidos() {
         '<input type="number" class="marcador-input" id="gol_' + p.id + '_local" min="0" max="20" value="" placeholder="0" />' +
         '<span class="marcador-guion">—</span>' +
         '<input type="number" class="marcador-input" id="gol_' + p.id + '_visita" min="0" max="20" value="" placeholder="0" />' +
-      '</div>' +
-      '<div class="resultado-radio-group">' +
-        '<div class="radio-opcion">' +
-          '<input type="radio" name="res_' + p.id + '" id="res_' + p.id + '_L" value="Local" />' +
-          '<label for="res_' + p.id + '_L"> ' + p.local + '</label>' +
-        '</div>' +
-        '<div class="radio-opcion">' +
-          '<input type="radio" name="res_' + p.id + '" id="res_' + p.id + '_E" value="Empate" />' +
-          '<label for="res_' + p.id + '_E"> Empate</label>' +
-        '</div>' +
-        '<div class="radio-opcion">' +
-          '<input type="radio" name="res_' + p.id + '" id="res_' + p.id + '_V" value="Visitante" />' +
-          '<label for="res_' + p.id + '_V"> ' + p.visitante + '</label>' +
-        '</div>' +
       '</div>';
     lista.appendChild(card);
   });
@@ -168,6 +137,13 @@ function inicializarEventos() {
   document.getElementById('linkYaRegistrado').addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('modalYaRegistrado').style.display = 'flex';
+  });
+
+  // Ver mis pronósticos desde pantalla de confirmación
+  document.getElementById('btnVerMisPron').addEventListener('click', function() {
+    if (estado.participante) {
+      cargarMisPronosticos(estado.participante.correo, estado.participante.nombre);
+    }
   });
 
   // Actualizar etiqueta de resultados admin al cambiar partido
@@ -236,19 +212,21 @@ function recopilarPronosticos() {
   PARTIDOS.forEach(function(p) {
     var golLocal  = document.getElementById('gol_' + p.id + '_local').value;
     var golVisita = document.getElementById('gol_' + p.id + '_visita').value;
-    var resultado = document.querySelector('input[name="res_' + p.id + '"]:checked');
 
-    if (golLocal === '' || golVisita === '' || !resultado) {
+    if (golLocal === '' || golVisita === '') {
       valido = false;
-      mensajeErr = 'Completa el marcador y resultado para: ' + p.local + ' vs ' + p.visitante;
+      mensajeErr = 'Completa el marcador para: ' + p.local + ' vs ' + p.visitante;
     } else {
+      var gL = parseInt(golLocal);
+      var gV = parseInt(golVisita);
+      var resultado = gL > gV ? 'Local' : gL < gV ? 'Visitante' : 'Empate';
       pronosticos.push({
-        partido:        p.local + ' vs ' + p.visitante,
-        equipoLocal:    p.local,
+        partido:         p.local + ' vs ' + p.visitante,
+        equipoLocal:     p.local,
         equipoVisitante: p.visitante,
-        golesLocal:     parseInt(golLocal),
-        golesVisitante: parseInt(golVisita),
-        resultado:      resultado.value
+        golesLocal:      gL,
+        golesVisitante:  gV,
+        resultado:       resultado
       });
     }
   });
@@ -328,19 +306,19 @@ function verificarYaRegistrado() {
 
   llamarAPI('verificarCorreo', { correo: correo }, function(resp) {
     if (resp.ok && resp.existe) {
-      // Buscar datos del participante
       llamarAPI('obtenerParticipantes', { busqueda: correo }, function(resp2) {
         var part = resp2.datos && resp2.datos.find(function(p) { return p.correo === correo; });
         if (part) {
           estado.participante = { nombre: part.nombre, correo: part.correo, telefono: part.telefono };
           estado.yaEnvio      = part.estado === 'Enviado';
-          guardarEstadoLocal();
-
           cerrarModalYaRegistrado();
 
           if (estado.yaEnvio) {
-            mostrarToast('Ya enviaste tus pronósticos. No pueden modificarse.', 'error');
+            // Ya envió — mostrar sus pronósticos
+            mostrarToast('¡Hola ' + part.nombre.split(' ')[0] + '! Aquí están tus pronósticos.', 'exito');
+            cargarMisPronosticos(correo, part.nombre);
           } else {
+            // Registrado pero no envió — puede completar pronósticos
             mostrarToast('¡Bienvenido de nuevo, ' + part.nombre.split(' ')[0] + '!', 'exito');
             document.getElementById('chipNombre').textContent = '👤 ' + part.nombre.split(' ')[0];
             setTimeout(function() { irAPantalla('pantallaPronosticos'); }, 1000);
@@ -352,6 +330,86 @@ function verificarYaRegistrado() {
     } else {
       mostrarToast('Este correo no está registrado. Por favor regístrate primero.', 'error');
     }
+  });
+}
+
+function cargarMisPronosticos(correo, nombre) {
+  var cont = document.getElementById('misPronContenido');
+  cont.innerHTML = '<div class="cargando"><span class="dot-spin"></span> Cargando tus pronósticos...</div>';
+  irAPantalla('pantallaMisPronosticos');
+
+  llamarAPI('obtenerPronosticos', { correo: correo }, function(resp) {
+    var lista = (resp.datos || []).filter(function(p) { return p.correo === correo; });
+
+    if (!lista.length) {
+      cont.innerHTML = '<p class="sin-datos" style="text-align:center; padding: 32px 0;">No se encontraron pronósticos para este correo.</p>';
+      return;
+    }
+
+    var partidos   = lista.filter(function(p) { return p.partido !== 'Final' && p.partido !== 'Campeón'; });
+    var final      = lista.find(function(p) { return p.partido === 'Final'; });
+    var campeonReg = lista.find(function(p) { return p.partido === 'Campeón'; });
+
+    var html = '<div style="background:var(--azul-medio);border-radius:12px;padding:16px 20px;margin-bottom:20px;">' +
+      '<p style="color:var(--dorado);font-weight:700;font-size:15px;margin:0 0 4px;">👤 ' + escHTML(nombre) + '</p>' +
+      '<p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;">' + escHTML(correo) + '</p>' +
+    '</div>';
+
+    // Partidos Ecuador
+    if (partidos.length) {
+      html += '<div class="seccion-encabezado" style="margin-bottom:12px;">' +
+        '<span class="seccion-icono">🇪🇨</span>' +
+        '<span class="seccion-tit">PARTIDOS DE ECUADOR</span>' +
+      '</div>';
+      partidos.forEach(function(p) {
+        var marcador = p.golesLocal + ' — ' + p.golesVisitante;
+        var resTexto = p.resultado === 'Local'     ? '✅ Gana ' + escHTML(p.equipoLocal || p.local) :
+                       p.resultado === 'Visitante' ? '✅ Gana ' + escHTML(p.equipoVisitante || p.visitante) :
+                                                     '🤝 Empate';
+        html += '<div class="partido-card" style="margin-bottom:12px;">' +
+          '<div class="partido-equipos">' +
+            '<div class="equipo-nombre">' + escHTML(p.equipoLocal || p.local || '') + '</div>' +
+            '<div class="partido-vs">VS</div>' +
+            '<div class="equipo-nombre derecha">' + escHTML(p.equipoVisitante || p.visitante || '') + '</div>' +
+          '</div>' +
+          '<div class="partido-marcador" style="pointer-events:none;">' +
+            '<div class="marcador-display">' + marcador + '</div>' +
+          '</div>' +
+          '<div style="text-align:center;padding:8px 0;font-size:13px;color:var(--dorado);">' + resTexto + '</div>' +
+        '</div>';
+      });
+    }
+
+    // Final
+    if (final) {
+      html += '<div class="seccion-encabezado" style="margin:20px 0 12px;">' +
+        '<span class="seccion-tit">LOS DOS EQUIPOS FINALISTAS</span>' +
+      '</div>' +
+      '<div class="finalistas-grid" style="background:var(--azul-medio);border-radius:12px;padding:16px;margin-bottom:16px;">' +
+        '<div class="finalista-box"><div style="color:var(--dorado);font-size:13px;font-weight:700;margin-bottom:6px;">FINALISTA 1</div>' +
+          '<div style="color:#fff;font-weight:600;">' + escHTML(final.equipoLocal || final.local || '') + '</div></div>' +
+        '<div class="finalistas-vs">VS</div>' +
+        '<div class="finalista-box"><div style="color:var(--dorado);font-size:13px;font-weight:700;margin-bottom:6px;">FINALISTA 2</div>' +
+          '<div style="color:#fff;font-weight:600;">' + escHTML(final.equipoVisitante || final.visitante || '') + '</div></div>' +
+      '</div>';
+    }
+
+    // Campeón
+    if (campeonReg) {
+      var campNombre = campeonReg.equipoLocal || campeonReg.local || campeonReg.resultado || '';
+      html += '<div class="seccion-pronosticos campeon-seccion" style="margin-bottom:16px;">' +
+        '<div class="seccion-encabezado" style="margin-bottom:10px;">' +
+          '<span class="seccion-icono"></span>' +
+          '<span class="seccion-tit">EQUIPO CAMPEÓN</span>' +
+        '</div>' +
+        '<div class="campeon-estrellas">★ ★ ★ ★ ★</div>' +
+        '<div style="text-align:center;font-size:20px;font-weight:700;color:#fff;padding:12px 0;">' +
+          escHTML(campNombre) +
+        '</div>' +
+      '</div>';
+    }
+
+    cont.innerHTML = html;
   });
 }
 
@@ -651,6 +709,7 @@ function simularRespuesta(accion, datos, callback) {
     } else if (accion === 'obtenerPronosticos') {
       var lista2 = _demoPron;
       if (datos.partido) lista2 = lista2.filter(function(p) { return p.partido === datos.partido; });
+      if (datos.correo)  lista2 = lista2.filter(function(p) { return p.correo === datos.correo; });
       callback({ ok: true, datos: lista2 });
 
     } else if (accion === 'registrarResultado') {
