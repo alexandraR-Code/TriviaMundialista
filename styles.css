@@ -1,0 +1,1397 @@
+/* ============================================================
+   TRIVIA MUNDIALISTA — JAIME RUIZ
+   Línea gráfica: azul marino + dorado + rojo Ecuador
+   Tipografía: Bebas Neue (títulos) + Montserrat (cuerpo)
+
+   Rediseño UX/UI — v2
+   - Misma identidad de marca, mismas clases e IDs.
+   - Mejoras: jerarquía visual, espaciado, tarjetas,
+     formularios, iconografía SVG, responsive refinado.
+   ============================================================ */
+
+/* ── Variables de marca ─────────────────────────────────── */
+:root {
+  --azul-marino:   #0a1628;
+  --azul-medio:    #0d2144;
+  --azul-claro:    #1a3a6b;
+  --azul-panel:    #102a52;
+  --dorado:        #f5c518;
+  --dorado-oscuro: #d4a017;
+  --rojo:          #e8001c;
+  --rojo-oscuro:   #b80016;
+  --blanco:        #ffffff;
+  --blanco-suave:  rgba(255,255,255,0.85);
+  --blanco-opaco:  rgba(255,255,255,0.12);
+  --radio:         16px;
+  --radio-sm:      10px;
+  --sombra:        0 10px 36px rgba(0,0,0,0.45);
+  --sombra-sm:     0 4px 16px rgba(0,0,0,0.3);
+  --borde-suave:   rgba(255,255,255,0.10);
+  --borde-dorado:  rgba(245,197,24,0.28);
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background:
+    radial-gradient(ellipse at top right, rgba(245,197,24,0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at bottom left, rgba(232,0,28,0.05) 0%, transparent 50%),
+    var(--azul-marino);
+  color: var(--blanco);
+  min-height: 100vh;
+  width: 100%;       /* Ocupa el ancho disponible */
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--dorado);
+  outline-offset: 2px;
+}
+
+/* ── Pantallas ──────────────────────────────────────────── */
+.pantalla {
+  width: 100%;       /* Ocupa todo el ancho en móviles */
+  display: none;
+  flex-direction: column;
+  height: auto;
+}
+.pantalla.activa { 
+  display: flex; 
+  flex-direction:column;
+  min-height:100vh;
+}
+
+/* ── HEADER MARCA ───────────────────────────────────────── */
+.header-marca {
+  background: rgba(10,22,40,0.95);
+  backdrop-filter: blur(10px) saturate(140%);
+  border-bottom: 1px solid var(--borde-dorado);
+  box-shadow: 0 1px 0 rgba(245,197,24,0.08), 0 4px 24px rgba(0,0,0,0.35);
+  padding: 10px 20px;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+
+.participante-chip {
+  background: rgba(245,197,24,0.08);
+  border: 1px solid var(--borde-dorado);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--dorado);
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── HERO REGISTRO ──────────────────────────────────────── */
+.registro-layout { display: contents; } /* neutral — no afecta el flujo */
+
+.hero-registro {
+  background:
+    linear-gradient(165deg, rgba(10,22,40,0.5) 30%, rgba(232,0,28,0.24) 100%),
+    radial-gradient(ellipse at 75% 50%, rgba(245,197,24,0.15) 0%, transparent 60%),
+    var(--azul-medio);
+  padding: 52px 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-registro::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--rojo) 30%, var(--dorado) 50%, var(--rojo) 70%, transparent);
+}
+
+.hero-registro::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 28px);
+  pointer-events: none;
+}
+
+.hero-contenido{
+    max-width: 800px;
+    width: 100%;
+}
+
+.hero-sub {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3.5px;
+  color: var(--dorado);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.hero-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(48px, 6vw, 76px);
+  line-height: 0.93;
+  color: var(--blanco);
+  letter-spacing: 4px;
+}
+
+.hero-titulo .dorado { color: var(--dorado); }
+
+.hero-linea-roja {
+  width: 56px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--rojo), var(--dorado-oscuro));
+  margin: 18px 0;
+  border-radius: 2px;
+}
+
+.hero-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.75;
+  max-width: 400px;
+}
+
+.hero-desc strong { color: var(--dorado); font-weight: 700; }
+
+.hero-trofeo {
+  font-size: clamp(80px, 12vw, 130px);
+  filter: drop-shadow(0 8px 28px rgba(245,197,24,0.4));
+  animation: flotarTrofeo 3.5s ease-in-out infinite;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+
+@keyframes flotarTrofeo {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
+
+/* ── FRANJA PREMIOS ─────────────────────────────────────── */
+.franja-premios {
+  background: linear-gradient(90deg, var(--rojo) 0%, var(--rojo-oscuro) 100%);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid rgba(245,197,24,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  width: 100%;
+}
+
+.premio-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+}
+
+.premio-sep { color: rgba(255,255,255,0.35); font-size: 14px; }
+
+/* ── TARJETA FORMULARIO ─────────────────────────────────── */
+.tarjeta-form {
+  flex-grow: 1;
+  background: linear-gradient(165deg, var(--azul-panel) 0%, var(--azul-medio) 100%);
+  border: 1px solid var(--borde-dorado);
+  border-radius: var(--radio);
+  padding: 24px 16px;       /* Reducimos el padding interno en móviles */
+  margin: 20px auto;
+  max-width: 700px;
+  width: calc(100% - 32px); /* Deja un margen seguro de 16px a los lados en smartphones */
+  box-shadow: var(--sombra);
+  position: relative;
+}
+
+.tarjeta-form::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 32px; right: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245,197,24,0.45), transparent);
+}
+
+/* Columna derecha del layout 2-col: no existe, clase neutral */
+.registro-derecha { display: contents; }
+
+.form-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--dorado);
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.form-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ── CAMPOS ─────────────────────────────────────────────── */
+.campo-grupo { margin-bottom: 18px; }
+
+.campo-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 8px;
+}
+
+.campo-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  border-radius: var(--radio-sm);
+  padding: 14px 16px;
+  font-size: 15px;
+  color: var(--blanco);
+  font-family: 'Montserrat', sans-serif;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.campo-input::placeholder { color: rgba(255,255,255,0.28); }
+
+.campo-input:hover { border-color: rgba(255,255,255,0.24); }
+
+.campo-input:focus {
+  border-color: var(--dorado);
+  background: rgba(245,197,24,0.06);
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.12);
+}
+
+.campo-input:invalid:not(:placeholder-shown) {
+  border-color: var(--rojo);
+}
+
+select.campo-input {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none'%3E%3Cpath d='M1 1L7 7L13 1' stroke='%23f5c518' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+select.campo-input option { background: var(--azul-medio); color: var(--blanco); }
+
+/* ── CHECKBOX POLÍTICA ──────────────────────────────────── */
+.politica-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-sm);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.check-label input[type="checkbox"] { display: none; }
+
+.check-custom {
+  width: 21px;
+  height: 21px;
+  border: 2px solid rgba(255,255,255,0.28);
+  border-radius: 5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.03);
+}
+
+.check-label:hover .check-custom { border-color: rgba(245,197,24,0.5); }
+
+.check-label input:checked + .check-custom {
+  background: var(--dorado);
+  border-color: var(--dorado);
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.18);
+}
+
+.check-label input:checked + .check-custom::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border-right: 2.5px solid var(--azul-marino);
+  border-bottom: 2.5px solid var(--azul-marino);
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.check-texto { font-size: 12.5px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+
+.link-politica { color: var(--dorado); text-decoration: none; cursor: pointer; font-weight: 600; border-bottom: 1px solid rgba(245,197,24,0.4); transition: border-color 0.2s; }
+.link-politica:hover { border-color: var(--dorado); }
+
+/* ── BOTONES ─────────────────────────────────────────────── */
+.btn-principal {
+  width: 100%;
+  background: linear-gradient(135deg, var(--dorado), var(--dorado-oscuro));
+  color: var(--azul-marino);
+  border: none;
+  border-radius: var(--radio-sm);
+  padding: 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s, filter 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(245,197,24,0.18);
+}
+
+.btn-principal:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245,197,24,0.4);
+  filter: brightness(1.05);
+}
+
+.btn-principal:active:not(:disabled) { transform: translateY(0); }
+
+.btn-principal:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-secundario {
+  background: rgba(245,197,24,0.05);
+  border: 1.5px solid var(--dorado);
+  color: var(--dorado);
+  border-radius: var(--radio-sm);
+  padding: 10px 18px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1.5px;
+  transition: background 0.2s, transform 0.15s;
+  text-transform: uppercase;
+}
+.btn-secundario:hover { background: rgba(245,197,24,0.15); transform: translateY(-1px); }
+.btn-secundario:active { transform: translateY(0); }
+
+.ya-registrado { text-align: center; font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 18px; }
+
+/* ── FOOTER PICHINCHA ───────────────────────────────────── */
+.footer-pichincha {
+  max-width: 100%;
+  margin: 0;
+  padding: 20px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  border-top: 1px solid var(--borde-suave);
+  background: rgba(10,22,40,0.6);
+}
+
+
+.pichincha-texto {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 6px;
+  color: var(--dorado);
+  display: block;
+  line-height: 1;
+}
+
+.pichincha-sub {
+  font-size: 9.5px;
+  letter-spacing: 3.5px;
+  color: rgba(255,255,255,0.75);
+  text-transform: uppercase;
+  display: block;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.redes-sociales {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.redes-iconos a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: static;
+  z-index: 1;
+  transition: transform 0.2s;
+}
+
+.redes-iconos img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.redes-iconos a:hover {
+  transform: scale(1.2);
+}
+
+.redes-sociales span svg { width: 17px; height: 17px; display: block; }
+
+.redes-handle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-left: 4px;
+}
+
+.redes-sociales .redes-handle {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  border: none;
+  padding-left: 6px;
+}
+
+.redes-sociales .redes-handle:hover { background: none; transform: none; }
+
+/* ── PANTALLA PRONÓSTICOS ───────────────────────────────── */
+.pron-hero {
+  background:
+    linear-gradient(160deg, rgba(232,0,28,0.18) 0%, transparent 70%),
+    var(--azul-medio);
+  padding: 32px 24px 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--borde-dorado);
+  position: relative;
+}
+
+.pron-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--rojo), transparent);
+}
+
+.pron-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(32px, 7vw, 52px);
+  letter-spacing: 3px;
+  line-height: 1.05;
+}
+
+/* ── SECCIONES DE PRONÓSTICOS ───────────────────────────── */
+.seccion-pronosticos {
+  max-width: 680px;
+  width: calc(100% - 40px);
+  margin: 20px auto;
+  background: linear-gradient(165deg, var(--azul-panel) 0%, var(--azul-medio) 100%);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio);
+  padding: 22px 24px;
+  box-shadow: var(--sombra-sm);
+}
+
+.seccion-encabezado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+.seccion-icono {
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(245,197,24,0.08);
+  border: 1px solid var(--borde-dorado);
+  flex-shrink: 0;
+}
+
+.seccion-tit {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 17px;
+  letter-spacing: 2.5px;
+  color: var(--dorado);
+}
+
+/* ── PARTIDO ────────────────────────────────────────────── */
+.lista-partidos { display: flex; flex-direction: column; gap: 14px; }
+
+.partido-card {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio-sm);
+  padding: 16px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.partido-card:hover {
+  border-color: rgba(245,197,24,0.22);
+  background: rgba(255,255,255,0.05);
+}
+
+.partido-equipos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.equipo-nombre {
+  flex: 1;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.equipo-nombre.derecha { justify-content: flex-end; text-align: right; }
+
+.partido-vs {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  padding: 2px 10px;
+  border: 1px solid var(--borde-suave);
+  border-radius: 999px;
+}
+
+.partido-marcador {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.marcador-input {
+  width: 58px;
+  text-align: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.16);
+  border-radius: var(--radio-sm);
+  color: var(--dorado);
+  padding: 8px 4px;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+
+.marcador-input::-webkit-outer-spin-button,
+.marcador-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.marcador-input::placeholder { color: rgba(245,197,24,0.25); }
+
+.marcador-input:focus {
+  border-color: var(--dorado);
+  outline: none;
+  background: rgba(245,197,24,0.08);
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.12);
+}
+
+.marcador-guion {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  color: rgba(255,255,255,0.3);
+}
+
+.resultado-radio-group {
+  display: flex;
+  gap: 8px;
+}
+
+.radio-opcion {
+  flex: 1;
+  position: relative;
+}
+
+.radio-opcion input { display: none; }
+
+.radio-opcion label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 6px;
+  border-radius: var(--radio-sm);
+  border: 1.5px solid rgba(255,255,255,0.14);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.radio-opcion label:hover {
+  border-color: rgba(245,197,24,0.4);
+  color: rgba(255,255,255,0.8);
+}
+
+.radio-opcion input:checked + label {
+  border-color: var(--dorado);
+  background: rgba(245,197,24,0.15);
+  color: var(--dorado);
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.1);
+}
+
+/* ── FINALISTAS Y CAMPEÓN ───────────────────────────────── */
+.finalistas-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.finalista-box { flex: 1; }
+
+.finalistas-vs {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: var(--dorado);
+  letter-spacing: 2px;
+  flex-shrink: 0;
+  padding-bottom: 14px;
+}
+
+.campeon-seccion { text-align: center; }
+
+.campeon-estrellas {
+  color: var(--dorado);
+  font-size: 18px;
+  letter-spacing: 6px;
+  margin-bottom: 14px;
+  opacity: 0.85;
+}
+
+.campeon-input { text-align: center; font-weight: 700; font-size: 17px; letter-spacing: 0.5px; }
+
+/* ── AVISO IRREVERSIBLE ─────────────────────────────────── */
+.aviso-irreversible {
+  background: rgba(232,0,28,0.10);
+  border: 1px solid rgba(232,0,28,0.35);
+  border-radius: var(--radio-sm);
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #ff8a96;
+  margin-bottom: 20px;
+  text-align: center;
+  line-height: 1.6;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.envio-final { margin-bottom: 0; }
+
+/* ── PANTALLA CONFIRMACIÓN ──────────────────────────────── */
+#pantallaConfirmacion {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.confirmacion-contenido {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  max-width: 540px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.confirmacion-icono {
+  font-size: 76px;
+  margin-bottom: 20px;
+  animation: bounceIn 0.6s ease;
+  filter: drop-shadow(0 6px 20px rgba(11,232,129,0.35));
+}
+
+@keyframes bounceIn {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.confirmacion-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 58px;
+  color: var(--dorado);
+  letter-spacing: 6px;
+  line-height: 1;
+}
+
+.confirmacion-redes {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio);
+  padding: 22px 24px;
+  font-size: 20px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.8;
+  width: 100%;
+}
+
+.redes-iconos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.redes-iconos span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(245,197,24,0.08);
+  border: 1px solid var(--borde-dorado);
+  color: var(--dorado);
+  transition: background 0.2s, transform 0.15s;
+}
+
+.redes-iconos span:hover {
+  background: rgba(245,197,24,0.18);
+  transform: translateY(-2px);
+}
+
+.redes-iconos span svg { width: 18px; height: 18px; }
+
+/* ── PANEL ADMIN ─────────────────────────────────────────── */
+.admin-header {
+  background: rgba(10,22,40,0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--borde-dorado);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+}
+
+.admin-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2.5px;
+  color: var(--dorado);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-salir-admin {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.75);
+  border-radius: var(--radio-sm);
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 1px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-salir-admin:hover { border-color: var(--dorado); color: var(--dorado); }
+
+.admin-tabs {
+  display: flex;
+  gap: 6px;
+  background: rgba(255,255,255,0.02);
+  padding: 14px 24px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+.admin-tab {
+  background: transparent;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.55);
+  border-radius: 999px;
+  padding: 9px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+}
+
+.admin-tab:hover { border-color: rgba(245,197,24,0.4); color: var(--blanco); }
+
+.admin-tab.activa {
+  background: var(--dorado);
+  color: var(--azul-marino);
+  border-color: var(--dorado);
+}
+
+.tab-contenido { display: none; padding: 24px; max-width: 980px; margin: 0 auto; width: 100%; }
+.tab-contenido.activo { display: block; }
+
+.admin-filtros {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.admin-busqueda { flex: 1; min-width: 220px; }
+
+.tabla-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--borde-suave);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra-sm);
+}
+
+.admin-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 540px;
+}
+
+.admin-tabla th {
+  background: var(--azul-claro);
+  color: var(--dorado);
+  padding: 13px 16px;
+  text-align: left;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1.5px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.admin-tabla td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--borde-suave);
+  color: rgba(255,255,255,0.85);
+  background: var(--azul-panel);
+}
+
+.admin-tabla tr:last-child td { border-bottom: none; }
+.admin-tabla tr:hover td { background: rgba(245,197,24,0.04); }
+
+.sin-datos {
+  text-align: center;
+  color: rgba(255,255,255,0.35);
+  font-style: italic;
+  padding: 36px !important;
+  background: var(--azul-panel);
+}
+
+.estado-enviado {
+  color: #0be881;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.estado-enviado::before { content: '●'; font-size: 9px; }
+
+.estado-pendiente {
+  color: var(--dorado);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.estado-pendiente::before { content: '●'; font-size: 9px; }
+
+.admin-resultado-form { max-width: 520px; }
+
+.resultado-marcador-grid {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* ── RANKING GANADORES ──────────────────────────────────── */
+.ranking-lista { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: linear-gradient(165deg, var(--azul-panel) 0%, var(--azul-medio) 100%);
+  border-radius: var(--radio-sm);
+  border: 1px solid var(--borde-suave);
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.ranking-item:hover { border-color: rgba(245,197,24,0.3); transform: translateX(2px); }
+
+.ranking-pos {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  color: var(--dorado);
+  width: 40px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ranking-pos.oro   { color: #FFD700; }
+.ranking-pos.plata { color: #C0C0C0; }
+.ranking-pos.bronce { color: #CD7F32; }
+
+.ranking-nombre { flex: 1; font-weight: 700; min-width: 0; }
+.ranking-correo { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.ranking-aciertos {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  color: #0be881;
+  flex-shrink: 0;
+  background: rgba(11,232,129,0.08);
+  border: 1px solid rgba(11,232,129,0.25);
+  border-radius: 999px;
+  padding: 4px 14px;
+}
+
+/* ── MODALES ─────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,12,24,0.78);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-caja {
+  background: linear-gradient(165deg, var(--azul-panel) 0%, var(--azul-medio) 100%);
+  border: 1px solid var(--borde-dorado);
+  border-radius: var(--radio);
+  padding: 28px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--borde-suave);
+}
+
+.modal-titulo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: var(--dorado);
+}
+
+.modal-cerrar {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--borde-suave);
+  color: rgba(255,255,255,0.6);
+  font-size: 16px;
+  cursor: pointer;
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.modal-cerrar:hover { color: var(--blanco); border-color: var(--dorado); }
+
+.modal-cuerpo {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.8;
+  margin-bottom: 22px;
+}
+
+.modal-cuerpo h4 {
+  color: var(--dorado);
+  font-size: 12.5px;
+  margin: 16px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.modal-cuerpo h4:first-child { margin-top: 0; }
+
+/* ── TOAST ──────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--azul-panel);
+  border: 1.5px solid var(--dorado);
+  border-radius: 999px;
+  padding: 13px 26px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blanco);
+  z-index: 9999;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.5);
+  animation: toastIn 0.3s ease;
+  max-width: 90vw;
+  text-align: center;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.toast.exito { border-color: #0be881; color: #0be881; }
+.toast.error { border-color: var(--rojo); color: #ff6b7a; }
+
+/* ── BOTÓN ADMIN OCULTO ─────────────────────────────────── */
+.admin-acceso-oculto {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  opacity: 0.12;
+  cursor: pointer;
+  font-size: 20px;
+  z-index: 200;
+  transition: opacity 0.2s;
+  user-select: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+.admin-acceso-oculto:hover { opacity: 0.5; background: rgba(255,255,255,0.05); }
+
+/* ── RESPONSIVE ─────────────────────────────────────────── */
+
+/* Pantalla grande con zoom alto (equivale a tablet) */
+@media (max-width: 900px) {
+  .hero-registro { padding: 40px 28px 36px; gap: 32px; }
+  .tarjeta-form { max-width: 480px; padding: 28px 24px; }
+  .seccion-pronosticos { width: calc(100% - 32px); }
+}
+
+/* Tablet */
+@media (max-width: 720px) {
+  .header-marca { padding: 10px 16px; }
+  .hero-registro { padding: 36px 20px 30px; gap: 24px; }
+  .tarjeta-form {
+    margin: 20px auto;
+    width: calc(100% - 24px);
+    padding: 26px 20px;
+  }
+  .franja-premios { gap: 14px; padding: 11px 16px; }
+}
+
+/* Móvil */
+@media (max-width: 560px) {
+  .hero-registro {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+    padding: 28px 16px 22px;
+  }
+  .hero-contenido { max-width: 100%; }
+  .hero-trofeo { font-size: 68px; order: -1; }
+  .hero-linea-roja { margin: 14px auto; }
+  .hero-desc { max-width: 100%; font-size: 13px; }
+  .hero-sub { font-size: 10px; }
+
+  .tarjeta-form {
+    padding: 22px 16px;
+    margin: 14px auto;
+    width: calc(100% - 16px);
+    border-radius: 12px;
+  }
+  .form-titulo { font-size: 22px; }
+  .campo-input { padding: 12px 14px; font-size: 14px; }
+  .btn-principal { font-size: 16px; padding: 14px; }
+
+  .franja-premios { flex-direction: column; gap: 7px; padding: 12px 16px; }
+  .premio-sep { display: none; }
+
+  .footer-pichincha { padding: 16px 16px 10px; }
+  .pichincha-texto { font-size: 21px; letter-spacing: 4px; }
+  .redes-sociales { gap: 10px; margin-top: 5px; }
+  
+  .redes-iconos img { width: 60px; height: 60px; }
+
+  .finalistas-grid { flex-direction: column; }
+  .finalistas-vs { padding-bottom: 0; align-self: center; }
+  .admin-tabs { gap: 6px; padding: 10px 14px; }
+  .admin-tab { padding: 8px 12px; font-size: 11px; }
+  .seccion-pronosticos { padding: 16px 14px; }
+  .marca-cargo { max-width: 150px; }
+  .confirmacion-titulo { font-size: 38px; }
+  .modal-caja { padding: 18px 14px; }
+  .participante-chip { max-width: 170px; font-size: 11px; }
+}
+
+/* Móvil pequeño */
+@media (max-width: 380px) {
+  .hero-registro { padding: 22px 12px 18px; }
+  .hero-trofeo { font-size: 54px; }
+  .tarjeta-form { padding: 18px 12px; width: calc(100% - 12px); }
+  .marcador-input { width: 50px; font-size: 26px; }
+  .copa-icono { display: none; }
+  .btn-principal { font-size: 15px; letter-spacing: 2px; }
+}
+
+/* ── SPINNER ────────────────────────────────────────────── */
+.cargando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: rgba(255,255,255,0.4);
+  font-size: 13px;
+  gap: 10px;
+}
+
+.dot-spin {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(245,197,24,0.25);
+  border-top-color: var(--dorado);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Reduced motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-trofeo, .confirmacion-icono, .dot-spin { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}
+/* ==========================
+   CLASES FALTANTES
+========================== */
+
+.marca-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.avatar-circulo{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    background:linear-gradient(
+        135deg,
+        var(--dorado),
+        var(--dorado-oscuro)
+    );
+    color:var(--azul-marino);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    font-size:16px;
+    flex-shrink:0;
+}
+
+.marca-texto{
+    display:flex;
+    flex-direction:column;
+}
+
+.marca-nombre{
+    font-family:'Bebas Neue',sans-serif;
+    color:var(--dorado);
+    letter-spacing:2px;
+    font-size:18px;
+    line-height:1;
+}
+
+.marca-cargo{
+    font-size:11px;
+    color:rgba(255,255,255,.7);
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+/* Spinner botones */
+
+.btn-spinner{
+    width:18px;
+    height:18px;
+    border:2px solid rgba(255,255,255,.3);
+    border-top-color:var(--azul-marino);
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+}
+
+.btn-principal.cargando{
+    pointer-events:none;
+    opacity:.8;
+}
+/* ============================================================
+   REGLAS RESPONSIVAS (MÓVILES Y TABLETAS)
+   ============================================================ */
+@media (max-width: 768px) {
+  
+  /* Ajustes del Header */
+  .header-inner {
+    flex-direction: column; /* Apila el logo y el chip del participante */
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .header-inner img {
+    max-width: 200px; /* Reduce el tamaño del logo en móviles */
+    height: auto;
+  }
+
+  .participante-chip {
+    max-width: 100%;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Ajustes del Hero (Sección informativa de arriba) */
+  .hero-registro {
+    flex-direction: column-reverse; /* Pone el trofeo arriba del texto en móviles */
+    text-align: center;
+    padding: 32px 16px;
+    gap: 20px;
+  }
+
+  .hero-linea-roja {
+    margin: 14px auto; /* Centra la línea decorativa */
+  }
+
+  .hero-desc {
+    margin: 0 auto;
+  }
+
+  .hero-trofeo {
+    font-size: 90px; /* Trofeo ligeramente más pequeño */
+  }
+
+  /* Grid de finalistas (Pantalla de Pronósticos) */
+  .finalistas-grid {
+    display: flex;
+    flex-direction: column; /* Cambia de columnas a filas en pantallas chicas */
+    gap: 12px;
+    align-items: center;
+  }
+
+  .finalistas-vs {
+    margin: 4px 0;
+  }
+
+  .finalista-box {
+    width: 100%;
+  }
+
+  /* Redes sociales en el Footer */
+  .redes-sociales {
+    flex-wrap: wrap; /* Si no caben los iconos, saltan de línea limpiamente */
+    justify-content: center;
+    gap: 10px;
+  }
+}

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trivia Mundialista — Jaime Ruiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 1: REGISTRO
+  ══════════════════════════════════════════════════════ -->
+  <section id="pantallaRegistro" class="pantalla activa">
+
+    <!-- Header con marca -->
+    <header class="header-marca">
+      <div class="header-inner">
+        <img src="Manual de marca/LogoJaimeRuiz.png" width="295" height="75" />
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <div class="hero-registro">
+      <div class="hero-contenido">
+        <p class="hero-sub">¡Pon a prueba tu instinto mundialista!</p>
+        <h1 class="hero-titulo">TRIVIA<br /><span class="dorado">MUNDIALISTA</span></h1>
+        <div class="hero-linea-roja"></div>
+        <p class="hero-desc">Pronostica los resultados de <strong>Ecuador</strong>, adivina quiénes jugarán la final y
+          quién levantará la <strong>Copa del Mundo</strong>.</p>
+      </div>
+      <div class="hero-trofeo" aria-hidden="true"></div>
+    </div>
+
+    <!-- Franja de premios -->
+    <div class="franja-premios">
+      <div class="premio-item"><span>Camisetas de La Tri</span></div>
+      <div class="premio-sep">·</div>
+      <div class="premio-item"><span>Balones del Mundial</span></div>
+      <div class="premio-sep">·</div>
+      <div class="premio-item"><span>Moto Eléctrica</span></div>
+    </div>
+
+    <!-- Formulario de registro -->
+    <div class="tarjeta-form">
+      <h2 class="form-titulo">REGISTRA TU PARTICIPACIÓN</h2>
+      <p class="form-sub">Completa el formulario para acceder a tus pronósticos</p>
+
+      <div class="campo-grupo">
+        <label class="campo-label">Nombre completo *</label>
+        <input type="text" id="regNombre" class="campo-input" placeholder="Tu nombre y apellido" maxlength="80" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Correo electrónico *</label>
+        <input type="email" id="regCorreo" class="campo-input" placeholder="correo@ejemplo.com" maxlength="100" />
+      </div>
+      <div class="campo-grupo">
+        <label class="campo-label">Número de teléfono *</label>
+        <input type="tel" id="regTelefono" class="campo-input" placeholder="0999 999 999" maxlength="15" />
+      </div>
+
+      <!-- Política de datos -->
+      <div class="politica-box">
+        <label class="check-label">
+          <input type="checkbox" id="chkPolitica" />
+          <span class="check-custom"></span>
+          <span class="check-texto">
+            Acepto la <a href="#" id="linkPolitica" class="link-politica">política de tratamiento de datos
+              personales</a> y autorizo el uso de mi información para esta actividad.
+          </span>
+        </label>
+      </div>
+
+      <button id="btnRegistrar" class="btn-principal" disabled>
+        <span class="btn-texto">REGISTRARME</span>
+        <span class="btn-spinner" style="display:none"></span>
+      </button>
+
+      <p class="ya-registrado">¿Ya te registraste? <a href="#" id="linkYaRegistrado" class="link-politica">Ingresa
+          aquí</a></p>
+    </div>
+
+    <!-- Footer Pichincha -->
+    <footer>
+      <div class="footer-pichincha">
+        <img src="Manual de marca/Pichinchaconhechos.png" width="120" height="40" alt="Pichincha" />
+      </div>
+        <div class="redes-sociales">
+          <span aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M13.5 21v-7.2h2.4l.4-2.8h-2.8v-1.6c0-.8.2-1.4 1.5-1.4h1.4V5.5c-.3 0-1.2-.1-2.2-.1-2.3 0-3.8 1.4-3.8 3.9v2.2H7.8v2.8H10V21h3.5z" />
+            </svg></span>
+          <span aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5" />
+              <circle cx="12" cy="12" r="3.6" />
+              <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" stroke="none" />
+            </svg></span>
+          <span aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M16.6 5.5c.7 1.3 2 2.2 3.4 2.4v2.6c-1.4 0-2.7-.4-3.8-1.2v5.6c0 2.6-2.1 4.6-4.6 4.6-2.6 0-4.6-2.1-4.6-4.6 0-2.6 2.1-4.6 4.6-4.6.3 0 .6 0 .9.1v2.7c-.3-.1-.6-.2-.9-.2-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2V3h2.4c.1.9.4 1.8 1.6 2.5z" />
+            </svg></span>
+            <br></br>
+        </div>
+      </div>
+    </footer>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 2: PRONÓSTICOS
+  ══════════════════════════════════════════════════════ -->
+  <section id="pantallaPronosticos" class="pantalla">
+
+    <header class="header-marca">
+      <div class="header-inner">
+        <div class="marca-left">
+          <div class="avatar-circulo">JR</div>
+          <div class="marca-texto">
+            <span class="marca-nombre">JAIME RUIZ</span>
+            <span class="marca-cargo">Trivia Mundialista</span>
+          </div>
+        </div>
+        <div class="participante-chip" id="chipNombre">👤 —</div>
+      </div>
+    </header>
+
+    <div class="pron-hero">
+      <h2 class="pron-titulo">PRONOSTICA<br /><span class="dorado">LOS RESULTADOS</span></h2>
+    </div>
+
+    <!-- Partidos Ecuador -->
+    <div class="seccion-pronosticos">
+      <div class="seccion-encabezado">
+        <span class="seccion-icono">🇪🇨</span>
+        <span class="seccion-tit">PARTIDOS DE ECUADOR</span>
+      </div>
+
+      <div id="listaPartidos" class="lista-partidos">
+        <!-- Generado por JS -->
+      </div>
+    </div>
+
+    <!-- Los dos finalistas -->
+    <div class="seccion-pronosticos">
+      <div class="seccion-encabezado">
+        <span class="seccion-icono"></span>
+        <span class="seccion-tit">LOS DOS EQUIPOS FINALISTAS</span>
+      </div>
+      <div class="finalistas-grid">
+        <div class="finalista-box">
+          <label class="campo-label">FINALISTA 1</label>
+          <input type="text" id="finalista1" class="campo-input" placeholder="Equipo..." />
+        </div>
+        <div class="finalistas-vs">VS</div>
+        <div class="finalista-box">
+          <label class="campo-label">FINALISTA 2</label>
+          <input type="text" id="finalista2" class="campo-input" placeholder="Equipo..." />
+        </div>
+      </div>
+    </div>
+
+    <!-- Campeón del mundo -->
+    <div class="seccion-pronosticos campeon-seccion">
+      <div class="seccion-encabezado">
+        <span class="seccion-icono"></span>
+        <span class="seccion-tit">EL EQUIPO CAMPEÓN DEL MUNDIAL</span>
+      </div>
+      <div class="campeon-estrellas">★ ★ ★ ★ ★</div>
+      <input type="text" id="campeonMundial" class="campo-input campeon-input"
+        placeholder="¿Quién levantará la Copa?" />
+    </div>
+
+    <!-- Política y botón envío -->
+    <div class="tarjeta-form envio-final">
+      <div class="aviso-irreversible">
+        <strong>Una vez enviados los pronósticos no podrán ser modificados.</strong>
+      </div>
+
+      <div class="politica-box">
+        <label class="check-label">
+          <input type="checkbox" id="chkPoliticaPron" />
+          <span class="check-custom"></span>
+          <span class="check-texto">
+            Confirmo que leí y acepto la <a href="#" id="linkPolitica2" class="link-politica">política de datos
+              personales</a>.
+          </span>
+        </label>
+      </div>
+
+      <button id="btnEnviarPron" class="btn-principal" disabled>
+        <span class="btn-texto">ENVIAR PRONÓSTICOS</span>
+        <span class="btn-spinner" style="display:none"></span>
+      </button>
+    </div>
+
+    <footer class="footer-pichincha">
+      <div class="footer-inner">
+        <span class="pichincha-texto">PICHINCHA</span>
+        <span class="pichincha-sub">— SE CONSTRUYE CON HECHOS —</span>
+      </div>
+    </footer>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 3: CONFIRMACIÓN
+  ══════════════════════════════════════════════════════ -->
+  <section id="pantallaConfirmacion" class="pantalla">
+    <div class="confirmacion-contenido">
+      <img src="Manual de marca/LogoJaimeRuiz.png"
+           style="width:280px; height:auto; display:block; margin:0 auto 32px;"
+           alt="Jaime Ruiz" />
+      <div class="confirmacion-redes">
+        <p>Síguenos en redes sociales</p>
+        <div class="redes-iconos">
+          <a href="https://www.facebook.com/JaimeRuizEc/about" target="_blank" rel="noopener noreferrer">
+            <img src="Manual de marca/fb.png" alt="Facebook">
+          </a>
+          <a href="https://www.instagram.com/jaime.ruiz.ec" target="_blank" rel="noopener noreferrer">
+            <img src="Manual de marca/IG.png" alt="Instagram">
+          </a>
+          <a href="https://www.tiktok.com/@jaimeruizec" target="_blank" rel="noopener noreferrer">
+            <img src="Manual de marca/Tk.png" alt="TikTok">
+          </a>
+        </div>
+      </div>
+    </div>
+    <footer class="footer-pichincha">
+      <div class="footer-inner">
+        <span class="pichincha-texto">PICHINCHA</span>
+        <span class="pichincha-sub">— SE CONSTRUYE CON HECHOS —</span>
+      </div>
+    </footer>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       PANTALLA 4: PANEL ADMINISTRATIVO
+  ══════════════════════════════════════════════════════ -->
+  <section id="pantallaAdmin" class="pantalla">
+    <div class="admin-header">
+      <h2 class="admin-titulo">⚙️ PANEL ADMINISTRATIVO</h2>
+      <button class="btn-salir-admin" onclick="salirAdmin()">← Salir</button>
+    </div>
+
+    <!-- Pestañas -->
+    <div class="admin-tabs">
+      <button class="admin-tab activa" onclick="cambiarTab('participantes')">👥 Participantes</button>
+      <button class="admin-tab" onclick="cambiarTab('pronosticos')">Pronósticos</button>
+      <button class="admin-tab" onclick="cambiarTab('resultados')">Resultados</button>
+      <button class="admin-tab" onclick="cambiarTab('ganadores')">Ganadores</button>
+    </div>
+
+    <!-- TAB: Participantes -->
+    <div id="tabParticipantes" class="tab-contenido activo">
+      <div class="admin-filtros">
+        <input type="text" id="busquedaParticipante" class="campo-input admin-busqueda"
+          placeholder="Buscar por nombre, correo o teléfono..." />
+        <button class="btn-secundario" onclick="buscarParticipantes()">Buscar</button>
+        <button class="btn-secundario" onclick="exportarCSV('participantes')">Exportar CSV</button>
+      </div>
+      <div class="tabla-scroll">
+        <table class="admin-tabla" id="tablaParticipantes">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Fecha Registro</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="bodyParticipantes">
+            <tr>
+              <td colspan="5" class="sin-datos">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Pronósticos -->
+    <div id="tabPronosticos" class="tab-contenido">
+      <div class="admin-filtros">
+        <select id="filtroPartido" class="campo-input admin-busqueda">
+          <option value="">Todos los partidos</option>
+        </select>
+        <button class="btn-secundario" onclick="filtrarPronosticos()">Filtrar</button>
+        <button class="btn-secundario" onclick="exportarCSV('pronosticos')">Exportar CSV</button>
+      </div>
+      <div class="tabla-scroll">
+        <table class="admin-tabla" id="tablaPronosticos">
+          <thead>
+            <tr>
+              <th>Participante</th>
+              <th>Partido</th>
+              <th>Pronóstico</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="bodyPronosticos">
+            <tr>
+              <td colspan="4" class="sin-datos">Cargando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Registrar Resultados -->
+    <div id="tabResultados" class="tab-contenido">
+      <div class="tarjeta-form admin-resultado-form">
+        <h3 class="form-titulo" style="font-size:16px;">REGISTRAR RESULTADO OFICIAL</h3>
+        <div class="campo-grupo">
+          <label class="campo-label">Partido</label>
+          <select id="resPartido" class="campo-input">
+            <option value="">Selecciona el partido</option>
+          </select>
+        </div>
+        <div class="resultado-marcador-grid">
+          <div class="campo-grupo">
+            <label class="campo-label" id="resLabelLocal">Goles Local</label>
+            <input type="number" id="resGolesLocal" class="campo-input" min="0" max="20" value="0" />
+          </div>
+          <div class="finalistas-vs">VS</div>
+          <div class="campo-grupo">
+            <label class="campo-label" id="resLabelVisitante">Goles Visitante</label>
+            <input type="number" id="resGolesVisitante" class="campo-input" min="0" max="20" value="0" />
+          </div>
+        </div>
+        <button class="btn-principal" onclick="guardarResultado()">GUARDAR RESULTADO</button>
+      </div>
+    </div>
+
+    <!-- TAB: Ganadores -->
+    <div id="tabGanadores" class="tab-contenido">
+      <button class="btn-secundario" style="margin-bottom:16px;" onclick="cargarGanadores()">Calcular Ganadores</button>
+      <div id="contenidoGanadores">
+        <p class="sin-datos">Haz clic en "Calcular Ganadores" para ver el ranking.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       MODAL: Política de privacidad
+  ══════════════════════════════════════════════════════ -->
+  <div id="modalPolitica" class="modal-overlay" style="display:none">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h3 class="modal-titulo">Política de Tratamiento de Datos Personales</h3>
+        <button class="modal-cerrar" onclick="cerrarModal()">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p>En cumplimiento de la <strong>Ley Orgánica de Protección de Datos Personales del Ecuador</strong>, le
+          informamos:</p>
+        <h4>1. Responsable del tratamiento</h4>
+        <p>Jaime Ruiz — Asambleísta por Pichincha.</p>
+        <h4>2. Datos que recopilamos</h4>
+        <p>Nombre completo, correo electrónico y número de teléfono.</p>
+        <h4>3. Finalidad</h4>
+        <p>Gestión de la Trivia Mundialista, identificación de ganadores y comunicación de resultados.</p>
+        <h4>4. Derechos del titular</h4>
+        <p>Puede ejercer sus derechos de acceso, rectificación, cancelación y oposición escribiendo a la dirección de
+          contacto oficial.</p>
+        <h4>5. Conservación</h4>
+        <p>Los datos se conservarán únicamente durante el período de la actividad y hasta la entrega de premios.</p>
+        <h4>6. Confidencialidad</h4>
+        <p>Sus datos no serán cedidos a terceros sin su consentimiento previo, salvo obligación legal.</p>
+      </div>
+      <button class="btn-principal" onclick="cerrarModal()">ENTENDIDO</button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       MODAL: Confirmación de envío
+  ══════════════════════════════════════════════════════ -->
+  <div id="modalConfirmarEnvio" class="modal-overlay" style="display:none">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h3 class="modal-titulo">⚠️ Confirmar envío</h3>
+      </div>
+      <div class="modal-cuerpo">
+        <p style="font-size:16px; text-align:center; line-height:1.6;">
+          Una vez enviados los pronósticos <strong>no podrán ser modificados</strong>.<br /><br />
+          ¿Estás seguro de que deseas enviar?
+        </p>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-secundario" style="flex:1" onclick="cerrarModalEnvio()">CANCELAR</button>
+        <button class="btn-principal" style="flex:1" onclick="confirmarEnvioFinal()">SÍ, ENVIAR</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════════
+       MODAL: Ya registrado — ingresar correo
+  ══════════════════════════════════════════════════════ -->
+  <div id="modalYaRegistrado" class="modal-overlay" style="display:none">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h3 class="modal-titulo">Ingresa tu correo</h3>
+        <button class="modal-cerrar" onclick="cerrarModalYaRegistrado()">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p>Si ya te registraste, ingresa tu correo para acceder a tus pronósticos.</p>
+        <div class="campo-grupo" style="margin-top:12px;">
+          <label class="campo-label">Correo electrónico</label>
+          <input type="email" id="correoYaRegistrado" class="campo-input" placeholder="correo@ejemplo.com" />
+        </div>
+      </div>
+      <button class="btn-principal" onclick="verificarYaRegistrado()">ACCEDER</button>
+    </div>
+  </div>
+
+
+  <!-- Toast de notificaciones -->
+  <div id="toast" class="toast" style="display:none"></div>
+
+  <!-- Botón oculto de acceso admin -->
+  <div id="adminAcceso" class="admin-acceso-oculto" title="Admin">
+    <span onclick="mostrarLoginAdmin()">⚙</span>
+  </div>
+
+  <!-- Modal login admin -->
+  <div id="modalLoginAdmin" class="modal-overlay" style="display:none">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h3 class="modal-titulo">Acceso Administrador</h3>
+        <button class="modal-cerrar"
+          onclick="document.getElementById('modalLoginAdmin').style.display='none'">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <div class="campo-grupo">
+          <label class="campo-label">Contraseña</label>
+          <input type="password" id="adminPassword" class="campo-input" placeholder="••••••••" />
+        </div>
+      </div>
+      <button class="btn-principal" onclick="loginAdmin()">INGRESAR</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
