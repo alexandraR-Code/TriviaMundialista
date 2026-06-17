@@ -13,8 +13,18 @@ var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyEAe_RPS8_4s8wrs
 var ADMIN_PASSWORD  = 'trivia2026';   // Cambia esta contraseña
 
 // Partidos de Ecuador (personaliza según el Mundial)
+// NOTA: el partido "ecu_vs_civ" ya se jugó y su pronóstico fue registrado.
+// Por eso tiene "bloqueado: true" y un "marcador" fijo con el valor guardado.
+// Para los próximos partidos que se jueguen, simplemente copia este mismo
+// patrón: agrega bloqueado:true y marcador:{local: X, visitante: Y} con el
+// resultado que corresponda.
 var PARTIDOS = [
-  { id: 'ecu_vs_civ',  local: 'Ecuador', visitante: 'Costa de Marfil',  bandLocal: '🇪🇨', bandVisita: '🇨🇮' },
+  {
+    id: 'ecu_vs_civ', local: 'Ecuador', visitante: 'Costa de Marfil',
+    bandLocal: '🇪🇨', bandVisita: '🇨🇮',
+    bloqueado: true,
+    marcador: { local: 0, visitante: 1 } // Ecuador 0 - Costa de Marfil 1
+  },
   { id: 'ecu_vs_cur',  local: 'Ecuador', visitante: 'Curazao',          bandLocal: '🇪🇨', bandVisita: '🇨🇼' },
   { id: 'ecu_vs_ger',  local: 'Ecuador', visitante: 'Alemania',         bandLocal: '🇪🇨', bandVisita: '🇩🇪' }
 ];
@@ -36,6 +46,7 @@ var _cachePronosticos   = [];
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', function() {
+  cargarEstadoLocal();
   construirPartidos();
   inicializarEventos();
   poblarSelectoresAdmin();
@@ -55,6 +66,24 @@ function guardarEstadoLocal() {
   } catch (e) { /* almacenamiento no disponible */ }
 }
 
+// Lee lo que guardó guardarEstadoLocal() y lo vuelve a poner en "estado".
+// Sin esto, cada vez que se recarga la página "estado.participante" se
+// queda en null aunque el usuario ya se hubiera registrado antes, y por
+// eso el botón "Ver mis pronósticos" no hacía nada al hacer clic.
+function cargarEstadoLocal() {
+  try {
+    var guardado = localStorage.getItem(LS_KEY);
+    if (!guardado) return;
+    var datos = JSON.parse(guardado);
+    if (datos && datos.participante) {
+      estado.participante = datos.participante;
+      estado.yaEnvio      = !!datos.yaEnvio;
+      var chip = document.getElementById('chipNombre');
+      if (chip) chip.textContent = '👤 ' + datos.participante.nombre.split(' ')[0];
+    }
+  } catch (e) { /* almacenamiento no disponible o datos corruptos */ }
+}
+
 
 // ============================================================
 // CONSTRUIR PARTIDOS DINÁMICAMENTE
@@ -67,17 +96,38 @@ function construirPartidos() {
   PARTIDOS.forEach(function(p) {
     var card = document.createElement('div');
     card.className = 'partido-card';
-    card.innerHTML =
-      '<div class="partido-equipos">' +
-        '<div class="equipo-nombre">' + p.bandLocal + ' ' + p.local + '</div>' +
-        '<div class="partido-vs">VS</div>' +
-        '<div class="equipo-nombre derecha">' + p.visitante + ' ' + p.bandVisita + '</div>' +
-      '</div>' +
-      '<div class="partido-marcador">' +
-        '<input type="number" class="marcador-input" id="gol_' + p.id + '_local" min="0" max="20" value="" placeholder="0" />' +
-        '<span class="marcador-guion">—</span>' +
-        '<input type="number" class="marcador-input" id="gol_' + p.id + '_visita" min="0" max="20" value="" placeholder="0" />' +
-      '</div>';
+
+    if (p.bloqueado) {
+      // ── Partido ya jugado / pronóstico ya registrado ──────────
+      // No se muestran <input>: se reemplazan por texto fijo
+      // (marcador-display) para que no pueda editarse, y se agrega
+      // una etiqueta "Ya registrado" para que quede claro al usuario.
+      card.classList.add('partido-bloqueado');
+      card.innerHTML =
+        '<div class="partido-equipos">' +
+          '<div class="equipo-nombre">' + p.bandLocal + ' ' + p.local + '</div>' +
+          '<div class="partido-vs">VS</div>' +
+          '<div class="equipo-nombre derecha">' + p.visitante + ' ' + p.bandVisita + '</div>' +
+        '</div>' +
+        '<div class="partido-marcador" style="pointer-events:none;">' +
+          '<div class="marcador-display">' + p.marcador.local + ' — ' + p.marcador.visitante + '</div>' +
+        '</div>' +
+        '<div class="etiqueta-bloqueado">🔒 Pronóstico ya registrado</div>';
+    } else {
+      // ── Partido editable normal ───────────────────────────────
+      card.innerHTML =
+        '<div class="partido-equipos">' +
+          '<div class="equipo-nombre">' + p.bandLocal + ' ' + p.local + '</div>' +
+          '<div class="partido-vs">VS</div>' +
+          '<div class="equipo-nombre derecha">' + p.visitante + ' ' + p.bandVisita + '</div>' +
+        '</div>' +
+        '<div class="partido-marcador">' +
+          '<input type="number" class="marcador-input" id="gol_' + p.id + '_local" min="0" max="20" value="" placeholder="0" />' +
+          '<span class="marcador-guion">—</span>' +
+          '<input type="number" class="marcador-input" id="gol_' + p.id + '_visita" min="0" max="20" value="" placeholder="0" />' +
+        '</div>';
+    }
+
     lista.appendChild(card);
   });
 }
@@ -113,41 +163,63 @@ function poblarSelectoresAdmin() {
 // ============================================================
 
 function inicializarEventos() {
+  // Pequeño ayudante: solo agrega el evento si el elemento existe.
+  // Antes, si CUALQUIER id de esta función no existía en el HTML
+  // (por ejemplo "linkYaRegistrado"), todo el addEventListener()
+  // siguiente lanzaba un error y JavaScript dejaba de ejecutar el
+  // resto de esta función. Eso significaba que botones definidos
+  // MÁS ABAJO en este mismo bloque (como "Ver mis pronósticos")
+  // nunca llegaban a recibir su evento de clic.
+  function on(id, evento, handler) {
+    var el = document.getElementById(id);
+    if (!el) {
+      console.warn('[inicializarEventos] No existe el elemento con id="' + id + '". Revisa que index.html lo tenga.');
+      return;
+    }
+    el.addEventListener(evento, handler);
+  }
+
   // Habilitar botón REGISTRARME cuando acepta política
-  document.getElementById('chkPolitica').addEventListener('change', function() {
+  on('chkPolitica', 'change', function() {
     document.getElementById('btnRegistrar').disabled = !this.checked;
   });
 
   // Habilitar botón ENVIAR cuando acepta política
-  document.getElementById('chkPoliticaPron').addEventListener('change', function() {
+  on('chkPoliticaPron', 'change', function() {
     document.getElementById('btnEnviarPron').disabled = !this.checked;
   });
 
   // Botón registrar
-  document.getElementById('btnRegistrar').addEventListener('click', registrarParticipante);
+  on('btnRegistrar', 'click', registrarParticipante);
 
   // Botón enviar pronósticos → muestra confirmación antes
-  document.getElementById('btnEnviarPron').addEventListener('click', mostrarConfirmacionEnvio);
+  on('btnEnviarPron', 'click', mostrarConfirmacionEnvio);
 
   // Modal política
-  document.getElementById('linkPolitica').addEventListener('click', function(e) { e.preventDefault(); abrirModal(); });
-  document.getElementById('linkPolitica2').addEventListener('click', function(e) { e.preventDefault(); abrirModal(); });
+  on('linkPolitica', 'click', function(e) { e.preventDefault(); abrirModal(); });
+  on('linkPolitica2', 'click', function(e) { e.preventDefault(); abrirModal(); });
 
   // Ya registrado
-  document.getElementById('linkYaRegistrado').addEventListener('click', function(e) {
+  on('linkYaRegistrado', 'click', function(e) {
     e.preventDefault();
     document.getElementById('modalYaRegistrado').style.display = 'flex';
   });
 
   // Ver mis pronósticos desde pantalla de confirmación
-  document.getElementById('btnVerMisPron').addEventListener('click', function() {
+  on('btnVerMisPron', 'click', function() {
     if (estado.participante) {
       cargarMisPronosticos(estado.participante.correo, estado.participante.nombre);
+    } else {
+      // Antes esto no hacía nada visible cuando no había participante
+      // en memoria (por ejemplo tras recargar la página). Ahora avisa
+      // al usuario y lo manda a identificarse con su correo.
+      mostrarToast('No encontramos tu sesión. Ingresa tu correo para ver tus pronósticos.', 'error');
+      document.getElementById('modalYaRegistrado').style.display = 'flex';
     }
   });
 
   // Actualizar etiqueta de resultados admin al cambiar partido
-  document.getElementById('resPartido').addEventListener('change', function() {
+  on('resPartido', 'change', function() {
     var val = this.value;
     var partido = PARTIDOS.find(function(p) {
       return (p.local + ' vs ' + p.visitante) === val;
@@ -210,6 +282,27 @@ function recopilarPronosticos() {
   var mensajeErr  = '';
 
   PARTIDOS.forEach(function(p) {
+
+    // ── Partido bloqueado: usamos directamente su marcador guardado.
+    // No leemos el DOM (no existen inputs para este partido) y no
+    // exigimos nada al usuario: simplemente se incluye en el envío
+    // con el resultado que ya estaba registrado.
+    if (p.bloqueado) {
+      var gL = p.marcador.local;
+      var gV = p.marcador.visitante;
+      var resultadoFijo = gL > gV ? 'Local' : gL < gV ? 'Visitante' : 'Empate';
+      pronosticos.push({
+        partido:         p.local + ' vs ' + p.visitante,
+        equipoLocal:     p.local,
+        equipoVisitante: p.visitante,
+        golesLocal:      gL,
+        golesVisitante:  gV,
+        resultado:       resultadoFijo
+      });
+      return; // saltar a siguiente partido del forEach
+    }
+
+    // ── Partido editable normal: se valida como antes ───────────
     var golLocal  = document.getElementById('gol_' + p.id + '_local').value;
     var golVisita = document.getElementById('gol_' + p.id + '_visita').value;
 
@@ -217,15 +310,15 @@ function recopilarPronosticos() {
       valido = false;
       mensajeErr = 'Completa el marcador para: ' + p.local + ' vs ' + p.visitante;
     } else {
-      var gL = parseInt(golLocal);
-      var gV = parseInt(golVisita);
-      var resultado = gL > gV ? 'Local' : gL < gV ? 'Visitante' : 'Empate';
+      var gL2 = parseInt(golLocal);
+      var gV2 = parseInt(golVisita);
+      var resultado = gL2 > gV2 ? 'Local' : gL2 < gV2 ? 'Visitante' : 'Empate';
       pronosticos.push({
         partido:         p.local + ' vs ' + p.visitante,
         equipoLocal:     p.local,
         equipoVisitante: p.visitante,
-        golesLocal:      gL,
-        golesVisitante:  gV,
+        golesLocal:      gL2,
+        golesVisitante:  gV2,
         resultado:       resultado
       });
     }
@@ -339,6 +432,22 @@ function cargarMisPronosticos(correo, nombre) {
   irAPantalla('pantallaMisPronosticos');
 
   llamarAPI('obtenerPronosticos', { correo: correo }, function(resp) {
+
+    // Antes, si la petición fallaba (CORS, sin internet, Apps Script
+    // caído, etc.) este código igual seguía de largo como si "datos"
+    // fuera una lista vacía, y mostraba "No se encontraron pronósticos"
+    // aunque el verdadero problema era que la conexión falló. Por eso
+    // parecía que el botón "no hacía nada": cambiaba de pantalla pero
+    // el mensaje no explicaba el error real.
+    if (!resp || resp.ok === false) {
+      cont.innerHTML =
+        '<p class="sin-datos" style="text-align:center; padding: 32px 0;">' +
+        '⚠️ No se pudo conectar con el servidor para obtener tus pronósticos.<br/>' +
+        (resp && resp.error ? escHTML(resp.error) : 'Error de conexión.') +
+        '<br/><br/>Verifica tu conexión a internet e inténtalo de nuevo.</p>';
+      return;
+    }
+
     var lista = (resp.datos || []).filter(function(p) { return p.correo === correo; });
 
     if (!lista.length) {

@@ -723,6 +723,28 @@ select.campo-input option { background: var(--azul-medio); color: var(--blanco);
   padding: 8px 0 4px;
 }
 
+/* ── PARTIDO BLOQUEADO (pronóstico ya registrado, no editable) ── */
+.partido-bloqueado {
+  background: rgba(245,197,24,0.05);
+  border-color: rgba(245,197,24,0.25);
+}
+
+.etiqueta-bloqueado {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--dorado-oscuro);
+  background: rgba(245,197,24,0.1);
+  border-radius: 999px;
+  padding: 5px 10px;
+  display: inline-block;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* ── FINALISTAS Y CAMPEÓN ───────────────────────────────── */
 .finalistas-grid {
   display: flex;
