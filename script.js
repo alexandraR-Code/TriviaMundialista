@@ -25,7 +25,12 @@ var PARTIDOS = [
     bloqueado: true,
     marcador: { local: 0, visitante: 1 } // Ecuador 0 - Costa de Marfil 1
   },
-  { id: 'ecu_vs_cur',  local: 'Ecuador', visitante: 'Curazao',          bandLocal: '🇪🇨', bandVisita: '🇨🇼' },
+  {
+    id: 'ecu_vs_cur', local: 'Ecuador', visitante: 'Curazao',
+    bandLocal: '🇪🇨', bandVisita: '🇨🇼',
+    bloqueado: true,
+    marcador: { local: 0, visitante: 0 }
+  },
   { id: 'ecu_vs_ger',  local: 'Ecuador', visitante: 'Alemania',         bandLocal: '🇪🇨', bandVisita: '🇩🇪' }
 ];
 
