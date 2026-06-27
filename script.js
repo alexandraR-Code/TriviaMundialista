@@ -31,7 +31,11 @@ var PARTIDOS = [
     bloqueado: true,
     marcador: { local: 0, visitante: 0 }
   },
-  { id: 'ecu_vs_ger',  local: 'Ecuador', visitante: 'Alemania',         bandLocal: '🇪🇨', bandVisita: '🇩🇪' }
+  { id: 'ecu_vs_ger',  local: 'Ecuador', visitante: 'Alemania',         
+    bandLocal: '🇪🇨', bandVisita: '🇩🇪',
+    bloqueado: true,
+    marcador: {local: 2, visitante: 1 }
+  }
 ];
 
 // ── ESTADO DE LA APLICACIÓN ──────────────────────────────────
