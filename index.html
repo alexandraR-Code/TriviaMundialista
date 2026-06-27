@@ -324,6 +324,7 @@
       <button class="admin-tab" onclick="cambiarTab('pronosticos')">Pronósticos</button>
       <button class="admin-tab" onclick="cambiarTab('resultados')">Resultados</button>
       <button class="admin-tab" onclick="cambiarTab('ganadores')">Ganadores</button>
+      <button class="admin-tab" onclick="cambiarTab('aciertos')">📊 Aciertos</button>
     </div>
 
     <!-- TAB: Participantes -->
@@ -412,6 +413,35 @@
       <button class="btn-secundario" style="margin-bottom:16px;" onclick="cargarGanadores()">Calcular Ganadores</button>
       <div id="contenidoGanadores">
         <p class="sin-datos">Haz clic en "Calcular Ganadores" para ver el ranking.</p>
+      </div>
+    </div>
+
+    <!-- TAB: Aciertos por Partido -->
+    <div id="tabAciertos" class="tab-contenido">
+      <div class="admin-filtros">
+        <select id="filtroAciertos" class="campo-input admin-busqueda">
+          <option value="">Selecciona un partido</option>
+        </select>
+        <button class="btn-secundario" onclick="cargarAciertos()">Ver Aciertos</button>
+      </div>
+      <div class="tabla-scroll">
+        <table class="admin-tabla">
+          <thead>
+            <tr>
+              <th>Participante</th>
+              <th>Pronóstico</th>
+              <th>Resultado Oficial</th>
+              <th>¿Acertó?</th>
+              <th>¿A Tiempo?</th>
+              <th>Válido</th>
+            </tr>
+          </thead>
+          <tbody id="bodyAciertos">
+            <tr>
+              <td colspan="6" class="sin-datos">Selecciona un partido y haz clic en "Ver Aciertos".</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>

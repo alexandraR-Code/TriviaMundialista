@@ -21,6 +21,27 @@ var HOJA_PARTICIPANTES = 'Participantes';
 var HOJA_PRONOSTICOS   = 'Pronósticos';
 var HOJA_RESULTADOS    = 'Resultados';
 
+// ── Fechas límite de cada partido (hora Ecuador UTC-5) ──────
+// El pronóstico solo cuenta como válido si fue enviado ANTES de esta hora.
+var FECHAS_PARTIDOS = {
+  'Ecuador vs Costa de Marfil': new Date(2026, 5, 14, 18, 0, 0),
+  'Ecuador vs Curazao':         new Date(2026, 5, 20, 19, 0, 0),
+  'Ecuador vs Alemania':        new Date(2026, 5, 25, 15, 0, 0),
+  'Ecuador vs Por Definir':     null
+};
+
+function parseFecha(val) {
+  if (val instanceof Date) return val;
+  if (typeof val === 'string' && val.length > 0) {
+    var partes = val.split(' ');
+    var d = partes[0].split('/');
+    var t = (partes[1] || '00:00:00').split(':');
+    return new Date(parseInt(d[2]), parseInt(d[1]) - 1, parseInt(d[0]),
+                    parseInt(t[0]), parseInt(t[1]), parseInt(t[2] || 0));
+  }
+  return null;
+}
+
 // ============================================================
 // doPost() — Punto de entrada principal para peticiones POST
 // Recibe JSON con { accion, datos } y delega a la función correcta.
@@ -38,8 +59,9 @@ function doPost(e) {
     else if (accion === 'obtenerParticipantes') respuesta = obtenerParticipantes(datos);
     else if (accion === 'obtenerPronosticos')   respuesta = obtenerPronosticos(datos);
     else if (accion === 'registrarResultado')   respuesta = registrarResultado(datos);
-    else if (accion === 'obtenerGanadores')     respuesta = obtenerGanadores();
-    else                                         respuesta = { ok: false, error: 'Acción desconocida: ' + accion };
+    else if (accion === 'obtenerGanadores')       respuesta = obtenerGanadores();
+    else if (accion === 'obtenerAciertosDetalle') respuesta = obtenerAciertosDetalle(datos);
+    else                                          respuesta = { ok: false, error: 'Acción desconocida: ' + accion };
 
   } catch (err) {
     respuesta = { ok: false, error: err.message };
@@ -235,14 +257,12 @@ function obtenerGanadores() {
   var resultados  = hojaRes.getRange(2, 1, lastRes - 1, 7).getValues();
   var pronosticos = hojaPron.getRange(2, 1, lastPron - 1, 9).getValues();
 
-  // Mapa de resultados oficiales por partido
   var mapRes = {};
   resultados.forEach(function(r) {
     mapRes[r[0]] = { resultado: r[5], golesLocal: r[3], golesVisitante: r[4] };
   });
 
-  // Comparar pronósticos con resultados
-  var aciertos = {}; // correo → { nombre, aciertos }
+  var aciertos = {};
   var aciertosPorPartido = {};
 
   pronosticos.forEach(function(p) {
@@ -252,10 +272,16 @@ function obtenerGanadores() {
     var resOficial = mapRes[partido];
     if (!resOficial) return;
 
+    var fechaLimite = FECHAS_PARTIDOS[partido];
+    if (fechaLimite) {
+      var fechaEnvio = parseFecha(p[8]);
+      if (fechaEnvio && fechaEnvio >= fechaLimite) return;
+    }
+
     if (!aciertos[correo]) aciertos[correo] = { nombre: nombre, correo: correo, total: 0 };
     if (!aciertosPorPartido[partido]) aciertosPorPartido[partido] = 0;
 
-    if (p[7] === resOficial.resultado) {
+    if (parseInt(p[5]) === parseInt(resOficial.golesLocal) && parseInt(p[6]) === parseInt(resOficial.golesVisitante)) {
       aciertos[correo].total++;
       aciertosPorPartido[partido]++;
     }
@@ -271,6 +297,59 @@ function obtenerGanadores() {
       aciertosPorPartido: aciertosPorPartido
     }
   };
+}
+
+function obtenerAciertosDetalle(filtros) {
+  var ss       = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var hojaRes  = ss.getSheetByName(HOJA_RESULTADOS);
+  var hojaPron = ss.getSheetByName(HOJA_PRONOSTICOS);
+
+  var lastRes  = hojaRes.getLastRow();
+  var lastPron = hojaPron.getLastRow();
+
+  if (lastRes < 2 || lastPron < 2) return { ok: true, aciertos: [] };
+
+  var resultados  = hojaRes.getRange(2, 1, lastRes - 1, 7).getValues();
+  var pronosticos = hojaPron.getRange(2, 1, lastPron - 1, 9).getValues();
+
+  var mapRes = {};
+  resultados.forEach(function(r) {
+    mapRes[r[0]] = { resultado: r[5], golesLocal: r[3], golesVisitante: r[4] };
+  });
+
+  var partido = filtros && filtros.partido ? filtros.partido : '';
+  var lista = [];
+
+  pronosticos.forEach(function(p) {
+    var pPartido = p[2];
+    if (partido && pPartido !== partido) return;
+    if (pPartido === 'Final' || pPartido === 'Campeón') return;
+
+    var resOficial = mapRes[pPartido];
+    if (!resOficial) return;
+
+    var acerto = parseInt(p[5]) === parseInt(resOficial.golesLocal) && parseInt(p[6]) === parseInt(resOficial.golesVisitante);
+
+    var fechaLimite = FECHAS_PARTIDOS[pPartido];
+    var fechaEnvio  = parseFecha(p[8]);
+    var aTiempo     = true;
+    if (fechaLimite && fechaEnvio) {
+      aTiempo = fechaEnvio < fechaLimite;
+    }
+
+    lista.push({
+      nombre:           p[1],
+      correo:           p[0],
+      partido:          pPartido,
+      pronostico:       p[5] + '-' + p[6] + ' (' + p[7] + ')',
+      resultadoOficial: resOficial.golesLocal + '-' + resOficial.golesVisitante + ' (' + resOficial.resultado + ')',
+      acerto:           acerto,
+      aTiempo:          aTiempo,
+      fechaEnvio:       fechaEnvio ? Utilities.formatDate(fechaEnvio, Session.getScriptTimeZone(), 'dd/MM/yyyy HH:mm:ss') : String(p[8])
+    });
+  });
+
+  return { ok: true, aciertos: lista };
 }
 
 

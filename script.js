@@ -22,19 +22,29 @@ var PARTIDOS = [
   {
     id: 'ecu_vs_civ', local: 'Ecuador', visitante: 'Costa de Marfil',
     bandLocal: '🇪🇨', bandVisita: '🇨🇮',
+    fecha: '2026-06-14T18:00:00-05:00',
     bloqueado: true,
-    marcador: { local: 0, visitante: 1 } // Ecuador 0 - Costa de Marfil 1
+    marcador: { local: 0, visitante: 1 }
   },
   {
     id: 'ecu_vs_cur', local: 'Ecuador', visitante: 'Curazao',
     bandLocal: '🇪🇨', bandVisita: '🇨🇼',
+    fecha: '2026-06-20T19:00:00-05:00',
     bloqueado: true,
     marcador: { local: 0, visitante: 0 }
   },
-  { id: 'ecu_vs_ger',  local: 'Ecuador', visitante: 'Alemania',         
+  {
+    id: 'ecu_vs_ger', local: 'Ecuador', visitante: 'Alemania',
     bandLocal: '🇪🇨', bandVisita: '🇩🇪',
+    fecha: '2026-06-25T15:00:00-05:00',
     bloqueado: true,
-    marcador: {local: 2, visitante: 1 }
+    marcador: { local: 2, visitante: 1 }
+  },
+  {
+    id: 'ecu_vs_tbd', local: 'Ecuador', visitante: 'Por Definir',
+    bandLocal: '🇪🇨', bandVisita: '🏳️',
+    fecha: null,
+    bloqueado: false
   }
 ];
 
@@ -121,7 +131,7 @@ function construirPartidos() {
         '<div class="partido-marcador" style="pointer-events:none;">' +
           '<div class="marcador-display">' + p.marcador.local + ' — ' + p.marcador.visitante + '</div>' +
         '</div>' +
-        '<div class="etiqueta-bloqueado">🔒 Pronóstico ya registrado</div>';
+        '<div class="etiqueta-bloqueado">🔒 Bloqueado </div>';
     } else {
       // ── Partido editable normal ───────────────────────────────
       card.innerHTML =
@@ -142,12 +152,14 @@ function construirPartidos() {
 }
 
 function poblarSelectoresAdmin() {
-  var selPartido   = document.getElementById('filtroPartido');
+  var selPartido    = document.getElementById('filtroPartido');
   var selResPartido = document.getElementById('resPartido');
+  var selAciertos   = document.getElementById('filtroAciertos');
 
   PARTIDOS.forEach(function(p) {
     var etiqueta = p.local + ' vs ' + p.visitante;
-    [selPartido, selResPartido].forEach(function(sel) {
+    [selPartido, selResPartido, selAciertos].forEach(function(sel) {
+      if (!sel) return;
       var opt = document.createElement('option');
       opt.value       = etiqueta;
       opt.textContent = etiqueta;
@@ -155,7 +167,6 @@ function poblarSelectoresAdmin() {
     });
   });
 
-  // Partidos extra para finales
   var extras = ['Semifinal 1', 'Semifinal 2', 'Final'];
   extras.forEach(function(e) {
     [selPartido, selResPartido].forEach(function(sel) {
@@ -565,7 +576,7 @@ function cambiarTab(nombre) {
   document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('activa'); });
   document.querySelectorAll('.tab-contenido').forEach(function(t) { t.classList.remove('activo'); });
 
-  var mapa = { participantes: 0, pronosticos: 1, resultados: 2, ganadores: 3 };
+  var mapa = { participantes: 0, pronosticos: 1, resultados: 2, ganadores: 3, aciertos: 4 };
   document.querySelectorAll('.admin-tab')[mapa[nombre]].classList.add('activa');
   document.getElementById('tab' + capitalizar(nombre)).classList.add('activo');
 
@@ -721,6 +732,84 @@ function cargarGanadores() {
 }
 
 
+// ── Aciertos por Partido ────────────────────────────────────
+
+function parseFechaLocal(fechaStr) {
+  if (!fechaStr) return null;
+  var s = String(fechaStr);
+  var partes = s.split(' ');
+  if (partes.length < 2) return null;
+  var d = partes[0].split('/');
+  var t = partes[1].split(':');
+  if (d.length < 3) return null;
+  return new Date(parseInt(d[2]), parseInt(d[1]) - 1, parseInt(d[0]),
+                  parseInt(t[0] || 0), parseInt(t[1] || 0), parseInt(t[2] || 0));
+}
+
+function cargarAciertos() {
+  var partidoNombre = document.getElementById('filtroAciertos').value;
+  if (!partidoNombre) {
+    mostrarToast('Selecciona un partido.', 'error');
+    return;
+  }
+
+  var partido = PARTIDOS.find(function(p) {
+    return (p.local + ' vs ' + p.visitante) === partidoNombre;
+  });
+
+  if (!partido || !partido.bloqueado || !partido.marcador) {
+    document.getElementById('bodyAciertos').innerHTML =
+      '<tr><td colspan="6" class="sin-datos">Este partido aún no tiene resultado oficial.</td></tr>';
+    return;
+  }
+
+  var tbody = document.getElementById('bodyAciertos');
+  tbody.innerHTML = '<tr><td colspan="6" class="sin-datos"><span class="dot-spin"></span> Cargando...</td></tr>';
+
+  var fechaLimite = partido.fecha ? new Date(partido.fecha) : null;
+  var resLocal  = partido.marcador.local;
+  var resVisita = partido.marcador.visitante;
+
+  llamarAPI('obtenerPronosticos', { partido: partidoNombre }, function(resp) {
+    if (!resp.ok) {
+      tbody.innerHTML = '<tr><td colspan="6" class="sin-datos">Error al cargar datos.</td></tr>';
+      return;
+    }
+
+    var lista = resp.datos || [];
+    if (!lista.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="sin-datos">No hay pronósticos para este partido.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = lista.map(function(p) {
+      var gL = parseInt(p.golesLocal);
+      var gV = parseInt(p.golesVisitante);
+      var acerto = (gL === resLocal && gV === resVisita);
+
+      var aTiempo = true;
+      if (fechaLimite && p.fecha) {
+        var fechaEnvio = parseFechaLocal(p.fecha);
+        if (fechaEnvio) aTiempo = fechaEnvio < fechaLimite;
+      }
+
+      var valido = acerto && aTiempo;
+
+      return '<tr>' +
+        '<td>' + escHTML(p.nombre) + '<br/><small style="color:rgba(255,255,255,0.4)">' + escHTML(p.correo) + '</small></td>' +
+        '<td style="text-align:center">' + gL + ' - ' + gV + '</td>' +
+        '<td style="text-align:center">' + resLocal + ' - ' + resVisita + '</td>' +
+        '<td style="text-align:center">' + (acerto ? '✅' : '❌') + '</td>' +
+        '<td style="text-align:center">' + (aTiempo ? '✅' : '⛔') + '</td>' +
+        '<td style="text-align:center;font-weight:700;color:' + (valido ? 'var(--dorado)' : '#ff4444') + '">' +
+          (valido ? '✅ Válido' : '❌ No válido') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  });
+}
+
+
 // ============================================================
 // EXPORTAR CSV
 // ============================================================
@@ -836,6 +925,9 @@ function simularRespuesta(accion, datos, callback) {
     } else if (accion === 'obtenerGanadores') {
       callback({ ok: true, ganadores: _demoPart.map(function(p) { return { nombre: p.nombre, correo: p.correo, total: Math.floor(Math.random()*3) }; }),
                  estadisticas: { totalParticipantes: _demoPart.length } });
+
+    } else if (accion === 'obtenerAciertosDetalle') {
+      callback({ ok: true, aciertos: [] });
 
     } else {
       callback({ ok: false, error: 'Acción desconocida.' });
