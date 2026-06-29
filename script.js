@@ -41,9 +41,9 @@ var PARTIDOS = [
     marcador: { local: 2, visitante: 1 }
   },
   {
-    id: 'ecu_vs_tbd', local: 'Ecuador', visitante: 'Por Definir',
-    bandLocal: '🇪🇨', bandVisita: '🏳️',
-    fecha: null,
+    id: 'ecu_vs_mex', local: 'Ecuador', visitante: 'Mexico',
+    bandLocal: '🇪🇨', bandVisita: '🇲🇽',
+    fecha: '2026-06-30T19:00:00-05:00',
     bloqueado: false
   }
 ];

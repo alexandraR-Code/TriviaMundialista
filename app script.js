@@ -27,7 +27,7 @@ var FECHAS_PARTIDOS = {
   'Ecuador vs Costa de Marfil': new Date(2026, 5, 14, 18, 0, 0),
   'Ecuador vs Curazao':         new Date(2026, 5, 20, 19, 0, 0),
   'Ecuador vs Alemania':        new Date(2026, 5, 25, 15, 0, 0),
-  'Ecuador vs Por Definir':     null
+  'Ecuador vs Mexico':           new Date(2026, 5, 30, 19, 0, 0)
 };
 
 function parseFecha(val) {
